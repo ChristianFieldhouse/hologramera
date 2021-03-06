@@ -88,6 +88,7 @@ class MainActivity : AppCompatActivity() {
 
                     image_view.setImageBitmap(output.convertImageProxyToBitmap())
                     output.close()
+                    //takePhoto()
                 }
             })
     }
