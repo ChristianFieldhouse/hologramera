@@ -20,6 +20,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.lang.Integer.max
 import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
@@ -58,7 +59,14 @@ class MainActivity : AppCompatActivity() {
         buffer.rewind()
         val bytes = ByteArray(buffer.capacity())
         buffer.get(bytes)
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        var bitmap =  BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true) // have to make a mutable one, todo: avoid copy
+        val w = max(bitmap.width, bitmap.height)
+        val newstuff = IntArray(w * w)
+        bitmap.setPixels(
+            newstuff, 0, w, 0, 0, bitmap.width, bitmap.height
+        )
+        return bitmap
     }
 
     private fun takePhoto() {
@@ -85,7 +93,6 @@ class MainActivity : AppCompatActivity() {
                 override fun onCaptureSuccess(output : ImageProxy) {
                     val msg = "Photo capture succeeded, should be in ram"
                     Log.d(TAG, msg)
-
                     image_view.setImageBitmap(output.convertImageProxyToBitmap())
                     output.close()
                     //takePhoto()
